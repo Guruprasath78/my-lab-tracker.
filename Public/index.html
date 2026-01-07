@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab Inventory - Add New</title>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            background: var(--card); 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            width: 400px;
+            border: 1px solid #334155;
+        }
+        h1 { font-weight: 300; text-align: center; color: var(--primary); margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 0.9rem; }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 8px; 
+            color: white; 
+            box-sizing: border-box;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+
+        .btn-add { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(#28a745); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-add:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        
+        .view-link { 
+            display: block; 
+            text-align: center; 
+            margin-top: 20px; 
+            color: #94a3b8; 
+            text-decoration: none; 
+            font-size: 0.9rem;
+        }
+        .view-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Lab Entry</h1>
+        <form action="/add-chemical" method="POST">
+            <div class="form-group">
+                <label>Chemical Name</label>
+                <input type="text" name="name" placeholder="e.g. Sodium Hydroxide" required>
+            </div>
+            <div class="form-group">
+                <label>Stock Level</label>
+                <input type="text" name="stock" placeholder="e.g. 10 Liters" required>
+            </div>
+            <div class="form-group">
+                <label>Safety Information</label>
+                <input type="text" name="safety" placeholder="e.g. Corrosive" required>
+            </div>
+            <div class="form-group">
+                <label>Storage Location</label>
+                <input type="text" name="storageLocation" placeholder="e.g. Cabinet A" required>
+            </div>
+            <button type="submit" class="btn-add">Add to Inventory</button>
+        </form>
+        <a href="/inventory" class="view-link">View Full Inventory →</a>
+    </div>
+</body>
+</html>

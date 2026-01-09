@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lab Inventory - Add New</title>
+    <link rel="stylesheet" href="/style.css">
     <style>
         :root {
             --primary: #00d2ff;
@@ -33,6 +34,19 @@
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 0.9rem; }
         
+        .success-banner {
+            background: #dcfce7; 
+            color: #166534; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            border: 1px solid #bbf7d0; 
+            text-align: center; 
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+            transition: opacity 0.5s ease; /* Smooth fade out */
+        }
+
         input { 
             width: 100%; 
             padding: 12px; 
@@ -48,7 +62,7 @@
         .btn-add { 
             width: 100%; 
             padding: 14px; 
-            background: var(#28a745); 
+            background: var(--primary); 
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -94,5 +108,30 @@
         </form>
         <a href="/inventory" class="view-link">View Full Inventory →</a>
     </div>
+    <script>
+    // 1. Look at the URL to see if it contains "?success=true"
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('success') === 'true') {
+    const banner = document.createElement('div');
+    // ... (your existing banner styles) ...
+    banner.innerHTML = "✅ Chemical added successfully!";
+    
+    // CHANGE THIS LINE:
+    const container = document.querySelector('.container');
+    container.prepend(banner); 
+        // 4. Make it disappear after 3 seconds
+        setTimeout(() => {
+            banner.style.transition = "opacity 0.5s";
+            banner.style.opacity = "0";
+            setTimeout(() => {
+                banner.remove();
+                // 5. Clean the URL (removes the ?success=true) 
+                // so the message doesn't come back if they refresh.
+                window.history.replaceState({}, document.title, "/");
+            }, 500);
+        }, 3000);
+} 
+</script>
 </body>
 </html>

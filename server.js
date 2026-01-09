@@ -35,15 +35,16 @@ app.post('/add-chemical', async (req, res) =>{
             storageLocation: req.body.storageLocation
         });
         await newChemical.save();
-        res.redirect('/') // Goes back to the form ofter saving
+        res.redirect('/?success=true'); // Goes back to the form ofter saving
            
     } catch (err){
         res.status(500).send("Error:"+ err.message);
     }
 });
 
-//New Live Inventory Route
+
 app.get('/inventory', async (req, res) => {
+    const showSuccess = req.query.success ==='true'; //Look at the URL
     try {
         let query = {};
 
@@ -67,6 +68,12 @@ app.get('/inventory', async (req, res) => {
                     --card: #1e293b;
                     --text: #f8fafc;
                 }
+                body.light-mode{
+                --bg:#f1f5f9;
+                --card:#ffffff;
+                --text:#1e293b;
+                --primary:#007bff;
+                }    
                 body { 
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
                     padding: 40px; 
@@ -120,12 +127,28 @@ app.get('/inventory', async (req, res) => {
                 .back-btn:hover { background: var(--primary); color: white; }
 
                 button { cursor: pointer; border-radius: 6px; font-weight: bold; }
-            </style>
+                @media print {
+                    /* Hide the buttons and search bar when printing */
+                    .back-btn, #theme-toggle, .search-container, button, form {
+                        display: none !important;
+                    }
+                    body { background: white; color: black; padding: 0; margin-top:20px;}
+                    tr { border: 1px solid #ccc; background: white !important; }
+                }
+                </style>
             </head>
-            <body>
-                                   
+            <body>            
                 <a href="/" class="back-btn">← Back to Form</a>
+                <button id = "theme-toggle" style="padding:8px 2px; background:var(--card); color:var(--primary); border:1px solid var(--primary); border-radius:6px; cursor: pointer; font-weight:bold;">
+                 🌓Switch Theme
+                </button>
+                
                 <h1>🧪 Current Lab Inventory</h1>
+                ${showSuccess ? `
+                    <div id="success-banner" style="background:#dcfce7; color:#166534; padding:15px;border-radius:8px; margin-bottom:20px; border: 1px solid #bbf7d0; text-align:center; font-weight:bold;">
+                    Chemical added successfully!
+                    </div>
+                    `: ''}
                 <div style="margin-bottom:20px">
                         <form action="/inventory" method="GET">
                         <div id="inventory-summary" style="display: flex; gap: 20px; margin-bottom: 20px;">
@@ -138,18 +161,26 @@ app.get('/inventory', async (req, res) => {
                         <div id="alert-count" style="font-size: 1.5rem; color: #ef4444; font-weight: bold;">0</div>
                     </div>
                     </div>    
-
-                            <input type="text" name="search" placeholder="Search by name..."
-                            style="padding: 10px; width: 300px; border-raddius:4px; border:1px solid #ddd;" >
-                            <button type="submit" style="padding: 10px 15px; background: #007bff; color: white; border:none; border-radius: 4px; cursor: pointer;">Search</button>
-                            <a href="/inventory" style="margin-left: 10px; color: #666; text-decoration:none;">Clear</a>
+                        <input type="text" name="search" placeholder="Search by name..."
+                        style="padding: 10px; width: 300px; border-raddius:4px; border:1px solid #ddd;" >
+                        <button type="submit" style="padding: 10px 15px; background: #007bff; color: white; border:none; border-radius: 4px; cursor: pointer;">Search</button>
+                        <a href="/inventory" style="margin-left: 10px; color: #666; text-decoration:none;">Clear</a>
                             
                         </form>
-                        <form action="/delete-all" method="POST" onsubmit="return confirm('Are you sure?');">
-                            <button style="background:red; color:white;">Delete All Inventory</button>
+                        ${allChemicals.length > 0 ?`
+                            <form action="/delete-all" method="POST" onsubmit="return confirm('Are you sure?');">
+                            <button style="background: linear-gradient(45deg, #ef4444, #991b1b); border: 2px solid #fecaca; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
+                                ⚠️ AUTHORIZE GLOBAL DELETE
+                            </button>
 
                         </form>
+                        ` : ''}
                     </div>
+            <div style="display: flex; justify-content: center; margin: 30px 0; gap: 20px;">
+                <button onclick="window.print()" style="padding: 12px 25px; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <span>🖨️</span> Print Professional Lab Report
+            </button>
+            </div>                    
                 <table>
                     <thead>
                         <tr>
@@ -163,7 +194,21 @@ app.get('/inventory', async (req, res) => {
         `;
 
         // Loop through each chemical and add a row to the table
-       allChemicals.forEach(item => {
+       
+       if (allChemicals.length === 0){
+        //1. If  no chemicals, add a special message row
+        html +=`
+            <tr>
+                <td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">
+                    <div style="font-size:3rem;">🧪</div>
+                    <h3>Your Lab is Empty</h3>
+                    <p> Add some chemical to get started.</p>
+                    </td>
+                    </tr>
+            `;      
+       } else{
+
+        allChemicals.forEach(item => {
         const stockNum = parseInt(item.stock) || 0;
         const stockColor = stockNum <= 5 ? '#ff4d4d' : '#f8fafc';
 
@@ -193,10 +238,11 @@ app.get('/inventory', async (req, res) => {
             </tr>
         `;
     });
+    }
         html += `
                     </tbody>
                 </table>                
-                <script>
+               <script>
                 const searchInput = document.querySelector('input[name="search"]');
                 const rows = document.querySelectorAll('.chemical-row');
                 const totalDisplay = document.getElementById('total-count');
@@ -232,7 +278,26 @@ app.get('/inventory', async (req, res) => {
 
                 // Run once on page load to show initial numbers
                 updateStats();
+  
+                const themeBtn = document.getElementById('theme-toggle');
+                themeBtn.addEventListener('click', () =>{
+                    document.body.classList.toggle('light-mode');
+                    
+                    const isLight = document.body.classList.contains('light-mode');
+                    localStorage.setItem('labTheme', isLight ? 'light' : 'dark');
+
+                    // Dynamic button text
+                    themeBtn.textContent = isLight ? "🌙Dark Mode" : "☀️Light Mode";
+
+                    });
+
+                    //Check for sved preference on page load
+                    if (localStorage.getItem('labTheme') === 'light'){
+                    document.body.classList.add('light-mode');
+                    themeBtn.textContent = "🌙Dark Mode";
+                    }
             </script>
+
             </body>
             </html>
         `;

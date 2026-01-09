@@ -1,0 +1,20 @@
+/* public/style.css */
+
+/* The Success Banner Style */
+.success-banner {
+    background: #dcfce7; 
+    color: #166534; 
+    padding: 15px; 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+    border: 1px solid #bbf7d0; 
+    text-align: center; 
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    transition: opacity 0.5s ease; /* Smooth fade out */
+}
+
+/* You can also move your body and container styles here 
+   to keep your HTML file clean! */
+
+  
